@@ -1,0 +1,62 @@
+- hosts: all
+  become: true
+  pre_tasks:
+    - name: Ensure the linux user is created and have its own home folder
+      user:
+        name: "{{ wordpress_user }}"
+        state: present
+        create_home: true
+        home: "/home/{{ wordpress_user }}"
+        shell: "/bin/bash"
+
+    - name: Ensure that the ssh folder is present for the linux user
+      file:
+        path: "/home/{{ wordpress_user }}/.ssh/"
+        state: directory
+        mode: 0755
+        owner: "{{ wordpress_user }}"
+        group: "{{ wordpress_user }}"
+
+    # - name: Ensure app folder is present
+    #   file:
+    #     path: "{{ app_path }}"
+    #     state: directory
+    #     owner: "{{ wordpress_user }}"
+    #     group: "{{ wordpress_user }}"
+    #     mode: 0755
+  
+    - name: Ensure needed APT packages are present
+      apt:
+        name:
+          - build-essential
+          - gcc
+          - g++
+          - git
+          # - varnish
+        state: present
+        update_cache: true
+        cache_valid_time: 300
+  tasks:
+    # - name: Ensure Apache is running with the app user
+    #   lineinfile:
+    #     path: /etc/apache2/envvars
+    #     regexp: '^export APACHE_RUN_USER=.*'
+    #     line: "export APACHE_RUN_USER={{ wordpress_user }}"
+
+    # - name: Ensure Apache is running with the app group
+    #   lineinfile:
+    #     path: /etc/apache2/envvars
+    #     regexp: '^export APACHE_RUN_GROUP=.*'
+    #     line: "export APACHE_RUN_GROUP={{ wordpress_user }}"
+
+    - name: Download WP cli
+      get_url:
+        url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+        dest: /usr/local/bin/wp
+        mode: 0755
+
+  roles:
+    - role: geerlingguy.apache
+    - role: geerlingguy.php
+    - role: geerlingguy.mysql
+    

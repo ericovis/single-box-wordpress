@@ -1,0 +1,4 @@
+server_name: "example.com"
+server_alias: "*.example.com"
+wordpress_root: /var/www/html
+wordpress_user: wordpress

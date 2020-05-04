@@ -1,0 +1,5 @@
+.git
+
+group_vars/all/main.yml
+inventory
+inventory.yml

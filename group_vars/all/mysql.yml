@@ -1,0 +1,9 @@
+mysql_root_username: root
+
+mysql_databases: 
+  - name: wordpress_db
+
+mysql_users: 
+  - name: wordpress_db_user
+    password: "{{ wordpress_db_user_password }}"
+    priv: "wordpress_db.*:ALL"

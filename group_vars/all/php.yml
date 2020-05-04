@@ -1,0 +1,16 @@
+php_memory_limit: "256M"
+php_max_execution_time: "120"
+php_upload_max_filesize: "128M"
+php_webserver_daemon: "apache2"
+php_install_recommends: true
+php_enable_php_fpm: false
+php_default_version_debian: "7.2"
+php_packages:
+  - php-common
+  - php-curl
+  - php-opcache
+  - php-mysql
+  - php-memcached
+  - php-redis
+  - php-apcu
+  - php-cli
