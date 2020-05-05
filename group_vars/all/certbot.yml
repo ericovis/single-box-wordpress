@@ -4,6 +4,6 @@ certbot_create_standalone_stop_services:
 certbot_create_if_missing: true
 certbot_auto_renew_minute: "20"
 certbot_auto_renew_hour: "5"
-certbot_certs:
+certbot_certs: 
   - domains:
     - "{{ server_name }}"

@@ -1,0 +1,15 @@
+# Will be user for configuring the web server
+server_name: "example.com"
+server_alias: "wp.{{ server_name }}"
+
+# Wordpress config for the Linux box
+wordpress_root: /var/www/html
+wordpress_user: wordpress # This is a name for a Linux user to be created on the taget box
+
+# Certbot config
+certbot_admin_email: "admin@{{ server_name }}"
+
+# If you want to block requests that don't have a particular value on the X-Nginx-Secret header you can use this setting
+# This can be particularly useful for configuting a server to olny respond to requests comming from a CDN
+
+# nginx_secret_header: "SecretValue!@#"

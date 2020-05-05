@@ -1,4 +1,0 @@
-server_name: "example.com"
-wordpress_root: /var/www/html
-wordpress_user: wordpress
-certbot_admin_email: admin@example.com
