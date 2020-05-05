@@ -88,11 +88,11 @@
         group: "{{ wordpress_user }}"
 
   roles:
-    # - role: Oefenweb.swapfile
-    # - role: geerlingguy.certbot
+    - role: Oefenweb.swapfile
+    - role: geerlingguy.certbot
     - role: geerlingguy.nginx
-    # - role: geerlingguy.php
-    # - role: geerlingguy.mysql        
+    - role: geerlingguy.php
+    - role: geerlingguy.mysql        
     - role: geerlingguy.apache  
     
       

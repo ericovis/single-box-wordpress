@@ -14,3 +14,4 @@ php_packages:
   - php-redis
   - php-apcu
   - php-cli
+  - php-xml
