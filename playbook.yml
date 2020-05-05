@@ -1,30 +1,14 @@
 - hosts: all
   become: true
   pre_tasks:
-    - name: Ensure the linux user is created and have its own home folder
+    - name: Ensure the wordpress user is created and have its own home folder
       user:
         name: "{{ wordpress_user }}"
         state: present
         create_home: true
         home: "/home/{{ wordpress_user }}"
         shell: "/bin/bash"
-
-    - name: Ensure that the ssh folder is present for the linux user
-      file:
-        path: "/home/{{ wordpress_user }}/.ssh/"
-        state: directory
-        mode: 0755
-        owner: "{{ wordpress_user }}"
-        group: "{{ wordpress_user }}"
-
-    # - name: Ensure app folder is present
-    #   file:
-    #     path: "{{ app_path }}"
-    #     state: directory
-    #     owner: "{{ wordpress_user }}"
-    #     group: "{{ wordpress_user }}"
-    #     mode: 0755
-  
+    
     - name: Ensure needed APT packages are present
       apt:
         name:
@@ -32,31 +16,83 @@
           - gcc
           - g++
           - git
-          # - varnish
+          - htop
+          - vim
+          - nginx
         state: present
         update_cache: true
         cache_valid_time: 300
   tasks:
-    # - name: Ensure Apache is running with the app user
-    #   lineinfile:
-    #     path: /etc/apache2/envvars
-    #     regexp: '^export APACHE_RUN_USER=.*'
-    #     line: "export APACHE_RUN_USER={{ wordpress_user }}"
+    - name: Ensure Apache is running with the wordpress user
+      lineinfile:
+        path: /etc/apache2/envvars
+        regexp: '^export APACHE_RUN_USER=.*'
+        line: "export APACHE_RUN_USER={{ wordpress_user }}"
+      register: apache_user
 
-    # - name: Ensure Apache is running with the app group
-    #   lineinfile:
-    #     path: /etc/apache2/envvars
-    #     regexp: '^export APACHE_RUN_GROUP=.*'
-    #     line: "export APACHE_RUN_GROUP={{ wordpress_user }}"
+    - name: Ensure Apache is running with the wordpress group
+      lineinfile:
+        path: /etc/apache2/envvars
+        regexp: '^export APACHE_RUN_GROUP=.*'
+        line: "export APACHE_RUN_GROUP={{ wordpress_user }}"
+      register: apache_group
+
+    - name: Ensure Apache is restarted
+      service: 
+        name: apache2
+        state: restarted
+      when: apache_group is changed or apache_user is changed
 
     - name: Download WP cli
       get_url:
         url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
         dest: /usr/local/bin/wp
         mode: 0755
+  
+    - name: Ensure wordpress folder has the right permisisons
+      file:
+        path: "{{ wordpress_root }}"
+        owner: "{{ wordpress_user }}"
+        group: "{{ wordpress_user }}"
+        recurse: true
+
+    - name: Check if wordpress installation exists
+      stat:
+        path: "{{ wordpress_root }}/wp-config.php"
+      register: wp_config
+    
+    - name: Download wordpress
+      become_user: "{{ wordpress_user }}"
+      command: "wp core download"
+      when: not wp_config.stat.exists
+      args:
+        chdir: "{{ wordpress_root }}"
+
+    - name: Configure wordpress
+      become_user: "{{ wordpress_user }}"
+      command: |
+        wp core config 
+        --dbhost=localhost
+        --dbname=wordpress_db
+        --dbuser=wordpress_db_user
+        --dbpass={{ wordpress_db_user_password }}
+      when: not wp_config.stat.exists
+      args:
+        chdir: "{{ wordpress_root }}"
+   
+    - name: Ensure that the wordpress config has the right permisisons
+      file:
+        path: "{{ wordpress_root }}/wp-config.php"
+        mode: 0644
+        owner: "{{ wordpress_user }}"
+        group: "{{ wordpress_user }}"
 
   roles:
-    - role: geerlingguy.apache
-    - role: geerlingguy.php
-    - role: geerlingguy.mysql
+    # - role: Oefenweb.swapfile
+    # - role: geerlingguy.certbot
+    - role: geerlingguy.nginx
+    # - role: geerlingguy.php
+    # - role: geerlingguy.mysql        
+    - role: geerlingguy.apache  
     
+      

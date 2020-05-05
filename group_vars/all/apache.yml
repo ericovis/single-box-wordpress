@@ -1,3 +1,5 @@
+apache_listen_ip: "127.0.0.1"
+apache_listen_port: 8080
 apache_create_vhosts: true
 apache_remove_default_vhost: true
 apache_packages:
@@ -6,30 +8,22 @@ apache_packages:
   - libapache2-mod-php
 apache_mods_enabled:
   - rewrite.load
-  - ssl.load
   - remoteip.load
   - headers.load
   - php7.2.load
 apache_global_vhost_settings: |
   DirectoryIndex index.php index.html index.htm
+apache_vhosts_ssl: []
 apache_vhosts:
   - servername: "{{ server_name }}"
-    serveralias: "{{ server_alias }}"
     apache_listen_ip: "127.0.0.1"
     apache_listen_port: 8080
     documentroot: "{{ wordpress_root }}"
     extra_parameters: |
       KeepAlive On
       KeepAliveTimeout 60
-
-      # Header config
-      RemoteIPHeader X-Forwarded-For
-
-      # Log format config
-      {% raw %}
-      LogFormat "{ \"timestamp\":\"%{%Y-%m-%dT%T}t%{%z}t\", \"process\":\"%D\", \"filename\":\"%f\", \"remote_ip\":\"%a\", \"host\":\"%v\", \"path\":\"%U\", \"query_string\":\"%q\", \"method\":\"%m\", \"response_code\":%>s, \"user_agent\":\"%{User-agent}i\", \"response_time\":%{ms}T, \"referer\":\"%{Referer}i\" }" json
-      {% endraw %}
-      SetEnv HTTPS "on"
-
+      RemoteIPHeader X-Real-IP
+      SetEnv HTTPS "on"     
+      SetEnv HTTP_HOST "{{ server_name }}"     
       ErrorLog ${APACHE_LOG_DIR}/error.log
-      CustomLog ${APACHE_LOG_DIR}/access.log json
+      CustomLog ${APACHE_LOG_DIR}/access.log combined
