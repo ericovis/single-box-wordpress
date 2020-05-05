@@ -51,7 +51,7 @@ nginx_vhosts:
 
           # Cache configuration
           proxy_cache reverse_cache;
-          proxy_cache_valid 60s;
+          proxy_cache_valid 60m;
           proxy_no_cache $cookie_PHPSESSID;
           proxy_cache_bypass $cookie_PHPSESSID;
           proxy_cache_key "$scheme$host$request_uri";
