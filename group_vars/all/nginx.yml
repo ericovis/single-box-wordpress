@@ -65,7 +65,7 @@ nginx_vhosts:
           add_header X-Cache $upstream_cache_status;
       }
       
-      # Enable Cache the file 30 days 
+      # Enable 30 days of dache for static files 
       location ~* .(jpg|png|gif|jpeg|css|mp3|wav|swf|mov|doc|pdf|xls|ppt|docx|pptx|xlsx)$ {
           proxy_cache_valid 200 120m;
           expires 30d;
@@ -73,8 +73,14 @@ nginx_vhosts:
           access_log off;
           try_files $uri $uri/ =404;
       }
-
+      
+      # Disable cache for these files
       location ~* .(?:manifest|appcache|html?|xml|json)$ {
+          expires -1;
+      }
+
+      # Disable cache for wp admin
+      location /wp-admin/ {
           expires -1;
       }
 
