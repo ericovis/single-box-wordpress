@@ -79,11 +79,6 @@ nginx_vhosts:
           expires -1;
       }
 
-      # Disable cache for wp admin
-      location /wp-admin/ {
-          expires -1;
-      }
-
       location ~ /\.ht {
           deny all;
       }
