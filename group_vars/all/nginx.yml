@@ -56,7 +56,6 @@ nginx_vhosts:
           proxy_pass http://wordpress;
 
           # Cache configuration
-          expires 2h;
           proxy_cache reverse_cache;
           proxy_cache_valid 120m;
           proxy_no_cache $cookie_PHPSESSID;
